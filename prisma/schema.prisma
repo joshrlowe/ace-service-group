@@ -1,0 +1,140 @@
+// Prisma schema for Ace Service Group
+// Using Vercel Postgres
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DATABASE_URL_UNPOOLED")
+}
+
+// Admin user for authentication
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  passwordHash  String
+  role          String    @default("admin")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+// Portfolio projects
+model Project {
+  id               String         @id @default(cuid())
+  title            String
+  slug             String         @unique
+  shortDescription String
+  fullDescription  String?
+  category         String
+  location         String?
+  projectDate      DateTime?
+  featured         Boolean        @default(false)
+  published        Boolean        @default(true)
+  tags             String[]       @default([])
+  images           ProjectImage[]
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  @@index([category])
+  @@index([featured])
+}
+
+// Project images (multiple per project)
+model ProjectImage {
+  id        String   @id @default(cuid())
+  url       String
+  alt       String?
+  order     Int      @default(0)
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@index([projectId])
+}
+
+// Site-wide settings (single row)
+model SiteSettings {
+  id                String   @id @default("default")
+
+  // Business info
+  businessName      String   @default("Ace Service Group LLC")
+  tagline           String   @default("At Ace Service Group, we turn problems into solutions.")
+  introText         String?
+
+  // Contact info
+  phone             String   @default("(267) 640-5958")
+  email             String   @default("aceservicegroupllc@gmail.com")
+  hours             String   @default("Always open")
+  serviceArea       String   @default("Lansdale, PA and surrounding areas")
+  address           String?
+
+  // Social links (nullable)
+  facebookUrl       String?
+  instagramUrl      String?
+  twitterUrl        String?
+  linkedinUrl       String?
+  youtubeUrl        String?
+
+  // Homepage hero
+  heroHeadline      String   @default("Quality Construction & Home Services")
+  heroSubheadline   String   @default("From simple plumbing calls to full scale renovations - we turn problems into solutions.")
+  heroCta1Text      String   @default("Call Now")
+  heroCta1Link      String   @default("tel:+12676405958")
+  heroCta2Text      String   @default("Request a Quote")
+  heroCta2Link      String   @default("/contact")
+  heroImageUrl      String?
+
+  // About page
+  aboutHeadline     String   @default("About Ace Service Group")
+  aboutContent      String?
+  aboutImageUrl     String?
+
+  updatedAt         DateTime @updatedAt
+}
+
+// Services offered
+model Service {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String
+  icon        String?  // Icon name from lucide-react
+  imageUrl    String?
+  featured    Boolean  @default(false)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([featured])
+}
+
+// Contact form submissions
+model ContactSubmission {
+  id          String   @id @default(cuid())
+  name        String
+  email       String
+  phone       String?
+  subject     String?
+  message     String
+  handled     Boolean  @default(false)
+  notes       String?  // Internal notes for admin
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([handled])
+  @@index([createdAt])
+}
+
+// Rate limiting for contact form
+model RateLimit {
+  id        String   @id
+  count     Int      @default(0)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([expiresAt])
+}
