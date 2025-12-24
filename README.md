@@ -6,7 +6,7 @@ A professional marketing website with admin CMS for Ace Service Group LLC, a con
 
 - **Framework**: Next.js 15 (App Router) + TypeScript
 - **Styling**: TailwindCSS v4
-- **Database**: PostgreSQL (Vercel Postgres)
+- **Database**: Prisma Postgres (via Vercel Marketplace)
 - **ORM**: Prisma
 - **Authentication**: NextAuth v5 (Auth.js) with Credentials provider
 - **File Uploads**: Vercel Blob
@@ -16,6 +16,7 @@ A professional marketing website with admin CMS for Ace Service Group LLC, a con
 ## Features
 
 ### Public Website
+
 - **Home** - Hero section, featured services, featured projects, CTA
 - **Services** - List of all services with descriptions
 - **Projects/Gallery** - Portfolio with category filtering
@@ -23,6 +24,7 @@ A professional marketing website with admin CMS for Ace Service Group LLC, a con
 - **Contact** - Contact form with rate limiting
 
 ### Admin Dashboard (`/admin`)
+
 - **Authentication** - Secure login with session management
 - **Dashboard** - Stats overview and quick actions
 - **Projects CRUD** - Create, edit, delete portfolio projects with multiple images
@@ -33,13 +35,15 @@ A professional marketing website with admin CMS for Ace Service Group LLC, a con
 ## Quick Start
 
 ### Prerequisites
+
 - Node.js 18+
-- PostgreSQL database (or Vercel Postgres)
+- Prisma Postgres database (via Vercel Marketplace)
 - Vercel account (for Blob storage)
 
 ### Local Development
 
 1. **Clone and install dependencies**
+
    ```bash
    git clone <repository-url>
    cd ace-service-group
@@ -47,15 +51,20 @@ A professional marketing website with admin CMS for Ace Service Group LLC, a con
    ```
 
 2. **Set up environment variables**
+
    ```bash
    cp .env.example .env.local
    ```
 
    Edit `.env.local` with your values:
+
    ```env
-   # Database
+   # Database (from Prisma Postgres via Vercel)
+   # After connecting Prisma Postgres in Vercel, pull env vars:
+   # vercel env pull .env.local
    DATABASE_URL="postgres://..."
-   DATABASE_URL_UNPOOLED="postgres://..."
+   # DATABASE_URL_UNPOOLED is optional - Prisma Postgres handles pooling internally
+   # If not set, Prisma will use DATABASE_URL for migrations
 
    # Auth
    AUTH_SECRET="generate-with-openssl-rand-base64-32"
@@ -71,6 +80,7 @@ A professional marketing website with admin CMS for Ace Service Group LLC, a con
    ```
 
 3. **Set up the database**
+
    ```bash
    # Push schema to database
    npm run db:push
@@ -80,6 +90,7 @@ A professional marketing website with admin CMS for Ace Service Group LLC, a con
    ```
 
 4. **Start development server**
+
    ```bash
    npm run dev
    ```
@@ -91,43 +102,63 @@ A professional marketing website with admin CMS for Ace Service Group LLC, a con
 ## Deployment to Vercel
 
 ### 1. Create Vercel Project
+
 ```bash
 vercel
 ```
 
-### 2. Set up Vercel Postgres
-1. Go to Vercel Dashboard → Storage → Create Database → Postgres
-2. Connect the database to your project
-3. The `DATABASE_URL` and `DATABASE_URL_UNPOOLED` will be automatically added
+### 2. Set up Prisma Postgres
+
+1. Go to Vercel Dashboard → **Storage** → **Create Database** → **Prisma Postgres**
+2. Choose your region and pricing plan
+3. Provide a name for your database and click **Create**
+4. In your Vercel project, go to **Storage** tab
+5. Select the Prisma Postgres database and click **Connect**
+6. This automatically sets `DATABASE_URL` (and optionally `POSTGRES_URL`, `PRISMA_DATABASE_URL`) in your project
+
+**Note:** Prisma Postgres handles connection pooling internally, so `DATABASE_URL_UNPOOLED` is optional. If not provided, Prisma will use `DATABASE_URL` for migrations.
 
 ### 3. Set up Vercel Blob
-1. Go to Vercel Dashboard → Storage → Create Store → Blob
+
+1. Go to Vercel Dashboard → **Storage** → **Create Store** → **Blob**
 2. Connect to your project
 3. The `BLOB_READ_WRITE_TOKEN` will be automatically added
 
 ### 4. Add Environment Variables
-In Vercel Dashboard → Settings → Environment Variables, add:
+
+In Vercel Dashboard → **Settings** → **Environment Variables**, add:
+
 - `AUTH_SECRET` - Generate with `openssl rand -base64 32`
+- `AUTH_URL` - Your production URL (e.g., `https://your-domain.vercel.app`)
 - `ADMIN_EMAIL` - Admin login email
 - `ADMIN_PASSWORD` - Admin login password
 - `ADMIN_NAME` - Admin display name
 
 ### 5. Deploy
+
 ```bash
 vercel --prod
 ```
 
 ### 6. Run Database Setup
+
 After first deployment, run migrations and seed:
+
 ```bash
-# Using Vercel CLI
+# Pull environment variables from Vercel
 vercel env pull .env.local
+
+# Push schema to database
 npm run db:push
+
+# Seed admin user and default data
 npm run db:seed
 ```
 
-Or use Vercel's build command to auto-migrate:
+**Alternative:** Use Vercel's build command to auto-migrate:
+
 - Build Command: `prisma generate && prisma db push && next build`
+- Note: This will run migrations on every deploy. For production, consider using `prisma migrate deploy` instead.
 
 ## Project Structure
 
@@ -178,6 +209,7 @@ Or use Vercel's build command to auto-migrate:
 ## Admin Workflow
 
 ### Adding a New Project
+
 1. Login at `/admin/login`
 2. Go to Dashboard → Projects → "Add Project"
 3. Fill in project details
@@ -186,12 +218,14 @@ Or use Vercel's build command to auto-migrate:
 6. Save → Project appears on public site
 
 ### Editing Site Content
+
 1. Go to Dashboard → Settings
 2. Edit business info, contact, hero section, about page
 3. Manage services in the Services section
 4. Save changes → Site updates immediately
 
 ### Managing Contact Submissions
+
 1. Go to Dashboard → Submissions
 2. View new submissions (marked with "New" badge)
 3. Add internal notes

@@ -13,7 +13,7 @@ async function main() {
 
   if (!adminEmail || !adminPassword) {
     throw new Error(
-      "ADMIN_EMAIL and ADMIN_PASSWORD environment variables are required for seeding"
+      "ADMIN_EMAIL and ADMIN_PASSWORD environment variables are required for seeding",
     );
   }
 

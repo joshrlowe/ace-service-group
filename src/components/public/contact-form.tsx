@@ -116,11 +116,16 @@ export function ContactForm() {
         />
       </div>
 
-      <Button type="submit" size="lg" className="w-full sm:w-auto" loading={isSubmitting}>
+      <Button
+        type="submit"
+        size="lg"
+        className="w-full sm:w-auto"
+        loading={isSubmitting}
+      >
         {isSubmitting ? "Sending..." : "Send Message"}
       </Button>
 
-      <p className="text-sm text-gray-500">
+      <p className="text-sm text-[#B0B0B0]">
         By submitting this form, you agree to be contacted about your inquiry.
       </p>
     </form>

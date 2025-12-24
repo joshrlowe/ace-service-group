@@ -1,14 +1,16 @@
 // Prisma schema for Ace Service Group
-// Using Vercel Postgres
+// Using Prisma Postgres (via Vercel Marketplace)
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DATABASE_URL_UNPOOLED")
+  provider = "postgresql"
+  // Use DATABASE_URL for direct database connection (needed for migrations)
+  // Prisma Accelerate URL (prisma+postgres://) is for runtime queries only
+  url      = env("DATABASE_URL")
+  // Prisma Postgres handles connection pooling internally, so directUrl is not needed
 }
 
 // Admin user for authentication

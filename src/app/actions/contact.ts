@@ -2,13 +2,25 @@
 
 import { prisma } from "@/lib/db";
 import { contactFormSchema } from "@/lib/validations";
+import { formatValidationErrors } from "@/lib/utils";
+import { parseContactFormData } from "@/lib/form-parsers";
 import { headers } from "next/headers";
 
-const RATE_LIMIT_WINDOW = 60 * 60 * 1000; // 1 hour
+const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hour
 const MAX_SUBMISSIONS_PER_WINDOW = 5;
+
+async function getClientIp(): Promise<string> {
+  const headersList = await headers();
+  return (
+    headersList.get("x-forwarded-for")?.split(",")[0] ||
+    headersList.get("x-real-ip") ||
+    "unknown"
+  );
+}
 
 async function checkRateLimit(identifier: string): Promise<boolean> {
   const now = new Date();
+  const expirationTime = new Date(now.getTime() + RATE_LIMIT_WINDOW_MS);
 
   // Clean up expired rate limits
   await prisma.rateLimit.deleteMany({
@@ -21,13 +33,8 @@ async function checkRateLimit(identifier: string): Promise<boolean> {
   });
 
   if (!rateLimit) {
-    // Create new rate limit entry
     await prisma.rateLimit.create({
-      data: {
-        id: identifier,
-        count: 1,
-        expiresAt: new Date(now.getTime() + RATE_LIMIT_WINDOW),
-      },
+      data: { id: identifier, count: 1, expiresAt: expirationTime },
     });
     return true;
   }
@@ -36,7 +43,6 @@ async function checkRateLimit(identifier: string): Promise<boolean> {
     return false;
   }
 
-  // Increment count
   await prisma.rateLimit.update({
     where: { id: identifier },
     data: { count: rateLimit.count + 1 },
@@ -47,15 +53,8 @@ async function checkRateLimit(identifier: string): Promise<boolean> {
 
 export async function submitContactForm(formData: FormData) {
   try {
-    // Get client IP for rate limiting
-    const headersList = await headers();
-    const ip =
-      headersList.get("x-forwarded-for")?.split(",")[0] ||
-      headersList.get("x-real-ip") ||
-      "unknown";
-
-    // Check rate limit
-    const rateLimitId = `contact-${ip}`;
+    const clientIp = await getClientIp();
+    const rateLimitId = `contact-${clientIp}`;
     const allowed = await checkRateLimit(rateLimitId);
 
     if (!allowed) {
@@ -66,26 +65,14 @@ export async function submitContactForm(formData: FormData) {
     }
 
     // Parse and validate form data
-    const rawData = {
-      name: formData.get("name"),
-      email: formData.get("email"),
-      phone: formData.get("phone") || undefined,
-      subject: formData.get("subject") || undefined,
-      message: formData.get("message"),
-    };
+    const rawData = parseContactFormData(formData);
 
     const validationResult = contactFormSchema.safeParse(rawData);
 
     if (!validationResult.success) {
-      const errors: Record<string, string> = {};
-      validationResult.error.errors.forEach((err) => {
-        if (err.path[0]) {
-          errors[err.path[0].toString()] = err.message;
-        }
-      });
       return {
         success: false,
-        errors,
+        errors: formatValidationErrors(validationResult.error),
         message: "Please fix the validation errors.",
       };
     }

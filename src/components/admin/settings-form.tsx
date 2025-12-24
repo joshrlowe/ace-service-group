@@ -7,7 +7,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { updateSiteSettings } from "@/app/actions/settings";
 
 interface SettingsFormProps {
@@ -74,10 +80,12 @@ export function SettingsForm({ settings }: SettingsFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Business Information */}
-      <Card>
+      <Card className="bg-[#121212] border-gray-800">
         <CardHeader>
-          <CardTitle>Business Information</CardTitle>
-          <CardDescription>Basic information about your business</CardDescription>
+          <CardTitle className="text-white">Business Information</CardTitle>
+          <CardDescription className="text-[#CFCFCF]">
+            Basic information about your business
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -117,10 +125,12 @@ export function SettingsForm({ settings }: SettingsFormProps) {
       </Card>
 
       {/* Contact Information */}
-      <Card>
+      <Card className="bg-[#121212] border-gray-800">
         <CardHeader>
-          <CardTitle>Contact Information</CardTitle>
-          <CardDescription>How customers can reach you</CardDescription>
+          <CardTitle className="text-white">Contact Information</CardTitle>
+          <CardDescription className="text-[#CFCFCF]">
+            How customers can reach you
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -183,10 +193,12 @@ export function SettingsForm({ settings }: SettingsFormProps) {
       </Card>
 
       {/* Social Links */}
-      <Card>
+      <Card className="bg-[#121212] border-gray-800">
         <CardHeader>
-          <CardTitle>Social Media Links</CardTitle>
-          <CardDescription>Links to your social media profiles (optional)</CardDescription>
+          <CardTitle className="text-white">Social Media Links</CardTitle>
+          <CardDescription className="text-[#CFCFCF]">
+            Links to your social media profiles (optional)
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -242,10 +254,12 @@ export function SettingsForm({ settings }: SettingsFormProps) {
       </Card>
 
       {/* Homepage Hero */}
-      <Card>
+      <Card className="bg-[#121212] border-gray-800">
         <CardHeader>
-          <CardTitle>Homepage Hero</CardTitle>
-          <CardDescription>Customize your homepage hero section</CardDescription>
+          <CardTitle className="text-white">Homepage Hero</CardTitle>
+          <CardDescription className="text-[#CFCFCF]">
+            Customize your homepage hero section
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
@@ -315,10 +329,12 @@ export function SettingsForm({ settings }: SettingsFormProps) {
       </Card>
 
       {/* About Page */}
-      <Card>
+      <Card className="bg-[#121212] border-gray-800">
         <CardHeader>
-          <CardTitle>About Page</CardTitle>
-          <CardDescription>Content for your About page</CardDescription>
+          <CardTitle className="text-white">About Page</CardTitle>
+          <CardDescription className="text-[#CFCFCF]">
+            Content for your About page
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
@@ -339,7 +355,7 @@ export function SettingsForm({ settings }: SettingsFormProps) {
               rows={8}
               placeholder="Tell visitors about your business..."
             />
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-[#CFCFCF]">
               Use line breaks to create paragraphs
             </p>
           </div>

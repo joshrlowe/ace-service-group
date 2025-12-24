@@ -6,7 +6,7 @@ import { submissionNotesSchema } from "@/lib/validations";
 
 export async function updateSubmission(
   id: string,
-  data: { handled?: boolean; notes?: string | null }
+  data: { handled?: boolean; notes?: string | null },
 ) {
   try {
     await requireAdmin();

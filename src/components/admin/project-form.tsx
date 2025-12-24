@@ -45,7 +45,7 @@ export function ProjectForm({ project, categories }: ProjectFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [imageUrls, setImageUrls] = useState<string[]>(
-    project?.images.map((img) => img.url) || []
+    project?.images.map((img) => img.url) || [],
   );
   const [newImageUrl, setNewImageUrl] = useState("");
   const [isUploading, setIsUploading] = useState(false);
@@ -140,9 +140,9 @@ export function ProjectForm({ project, categories }: ProjectFormProps) {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main Content */}
         <div className="lg:col-span-2 space-y-6">
-          <Card>
+          <Card className="bg-[#121212] border-gray-800">
             <CardHeader>
-              <CardTitle>Project Details</CardTitle>
+              <CardTitle className="text-white">Project Details</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
@@ -157,7 +157,9 @@ export function ProjectForm({ project, categories }: ProjectFormProps) {
                   placeholder="Project title"
                   onChange={(e) => {
                     if (!project) {
-                      const slugInput = document.getElementById("slug") as HTMLInputElement;
+                      const slugInput = document.getElementById(
+                        "slug",
+                      ) as HTMLInputElement;
                       if (slugInput) {
                         slugInput.value = slugify(e.target.value);
                       }
@@ -177,7 +179,7 @@ export function ProjectForm({ project, categories }: ProjectFormProps) {
                   error={errors.slug}
                   placeholder="project-url-slug"
                 />
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-[#CFCFCF]">
                   URL-friendly identifier (auto-generated from title)
                 </p>
               </div>
@@ -248,7 +250,9 @@ export function ProjectForm({ project, categories }: ProjectFormProps) {
                     type="date"
                     defaultValue={
                       project?.projectDate
-                        ? new Date(project.projectDate).toISOString().split("T")[0]
+                        ? new Date(project.projectDate)
+                            .toISOString()
+                            .split("T")[0]
                         : ""
                     }
                   />
@@ -262,22 +266,22 @@ export function ProjectForm({ project, categories }: ProjectFormProps) {
                     defaultValue={project?.tags.join(", ") || ""}
                     placeholder="tag1, tag2, tag3"
                   />
-                  <p className="text-xs text-gray-500">Comma-separated</p>
+                  <p className="text-xs text-[#CFCFCF]">Comma-separated</p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
           {/* Images */}
-          <Card>
+          <Card className="bg-[#121212] border-gray-800">
             <CardHeader>
-              <CardTitle>Images</CardTitle>
+              <CardTitle className="text-white">Images</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               {/* Image Upload */}
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                <Upload className="mx-auto h-12 w-12 text-gray-400" />
-                <p className="mt-2 text-sm text-gray-600">
+              <div className="border-2 border-dashed border-gray-700 rounded-lg p-6 text-center bg-[#0F0F0F]">
+                <Upload className="mx-auto h-12 w-12 text-[#CFCFCF]" />
+                <p className="mt-2 text-sm text-[#CFCFCF]">
                   Upload images or add URLs
                 </p>
                 <div className="mt-4 flex flex-col sm:flex-row gap-2 justify-center">
@@ -290,8 +294,15 @@ export function ProjectForm({ project, categories }: ProjectFormProps) {
                       className="hidden"
                       disabled={isUploading}
                     />
-                    <Button type="button" variant="outline" disabled={isUploading} asChild>
-                      <span>{isUploading ? "Uploading..." : "Upload Files"}</span>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      disabled={isUploading}
+                      asChild
+                    >
+                      <span>
+                        {isUploading ? "Uploading..." : "Upload Files"}
+                      </span>
                     </Button>
                   </label>
                 </div>
@@ -304,7 +315,11 @@ export function ProjectForm({ project, categories }: ProjectFormProps) {
                   value={newImageUrl}
                   onChange={(e) => setNewImageUrl(e.target.value)}
                 />
-                <Button type="button" variant="outline" onClick={handleAddImageUrl}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleAddImageUrl}
+                >
                   Add URL
                 </Button>
               </div>
@@ -315,7 +330,7 @@ export function ProjectForm({ project, categories }: ProjectFormProps) {
                   {imageUrls.map((url, index) => (
                     <div
                       key={index}
-                      className="relative group aspect-video bg-gray-100 rounded-lg overflow-hidden"
+                      className="relative group aspect-video bg-[#0F0F0F] rounded-lg overflow-hidden"
                     >
                       <Image
                         src={url}
@@ -334,7 +349,7 @@ export function ProjectForm({ project, categories }: ProjectFormProps) {
                         </button>
                       </div>
                       {index === 0 && (
-                        <span className="absolute top-2 left-2 bg-blue-600 text-white text-xs px-2 py-0.5 rounded">
+                        <span className="absolute top-2 left-2 bg-[#B71C1C] text-white text-xs px-2 py-0.5 rounded">
                           Cover
                         </span>
                       )}
@@ -352,9 +367,9 @@ export function ProjectForm({ project, categories }: ProjectFormProps) {
 
         {/* Sidebar */}
         <div className="space-y-6">
-          <Card>
+          <Card className="bg-[#121212] border-gray-800">
             <CardHeader>
-              <CardTitle>Publish</CardTitle>
+              <CardTitle className="text-white">Publish</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
@@ -363,7 +378,7 @@ export function ProjectForm({ project, categories }: ProjectFormProps) {
                   id="published"
                   name="published"
                   defaultValue={project?.published !== false ? "true" : "false"}
-                  className="h-9 rounded-md border border-gray-300 bg-white px-3 text-sm"
+                  className="h-9 rounded-md border border-gray-700 bg-[#121212] text-[#CFCFCF] px-3 text-sm"
                 >
                   <option value="true">Published</option>
                   <option value="false">Draft</option>
@@ -376,7 +391,7 @@ export function ProjectForm({ project, categories }: ProjectFormProps) {
                   id="featured"
                   name="featured"
                   defaultValue={project?.featured ? "true" : "false"}
-                  className="h-9 rounded-md border border-gray-300 bg-white px-3 text-sm"
+                  className="h-9 rounded-md border border-gray-700 bg-[#121212] text-[#CFCFCF] px-3 text-sm"
                 >
                   <option value="false">No</option>
                   <option value="true">Yes</option>
@@ -390,8 +405,8 @@ export function ProjectForm({ project, categories }: ProjectFormProps) {
                   {isSubmitting
                     ? "Saving..."
                     : project
-                    ? "Update Project"
-                    : "Create Project"}
+                      ? "Update Project"
+                      : "Create Project"}
                 </Button>
                 <Button
                   type="button"

@@ -1,81 +1,44 @@
 "use server";
 
-import { revalidateTag } from "next/cache";
 import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth";
 import { siteSettingsSchema, serviceSchema } from "@/lib/validations";
-import { CACHE_TAGS } from "@/lib/data";
+import { formatValidationErrors } from "@/lib/utils";
+import {
+  revalidateSettingsPaths,
+  revalidateServicePaths,
+} from "@/lib/revalidation";
+import {
+  parseServiceFormData,
+  parseSiteSettingsFormData,
+  normalizeNullableUrls,
+} from "@/lib/form-parsers";
 
 export async function updateSiteSettings(formData: FormData) {
   try {
     await requireAdmin();
 
-    const rawData = {
-      businessName: formData.get("businessName"),
-      tagline: formData.get("tagline") || null,
-      introText: formData.get("introText") || null,
-      phone: formData.get("phone"),
-      email: formData.get("email"),
-      hours: formData.get("hours") || null,
-      serviceArea: formData.get("serviceArea") || null,
-      address: formData.get("address") || null,
-      facebookUrl: formData.get("facebookUrl") || null,
-      instagramUrl: formData.get("instagramUrl") || null,
-      twitterUrl: formData.get("twitterUrl") || null,
-      linkedinUrl: formData.get("linkedinUrl") || null,
-      youtubeUrl: formData.get("youtubeUrl") || null,
-      heroHeadline: formData.get("heroHeadline"),
-      heroSubheadline: formData.get("heroSubheadline") || null,
-      heroCta1Text: formData.get("heroCta1Text") || null,
-      heroCta1Link: formData.get("heroCta1Link") || null,
-      heroCta2Text: formData.get("heroCta2Text") || null,
-      heroCta2Link: formData.get("heroCta2Link") || null,
-      heroImageUrl: formData.get("heroImageUrl") || null,
-      aboutHeadline: formData.get("aboutHeadline") || null,
-      aboutContent: formData.get("aboutContent") || null,
-      aboutImageUrl: formData.get("aboutImageUrl") || null,
-    };
+    const rawData = parseSiteSettingsFormData(formData);
 
     const validationResult = siteSettingsSchema.safeParse(rawData);
 
     if (!validationResult.success) {
-      const errors: Record<string, string> = {};
-      validationResult.error.errors.forEach((err) => {
-        if (err.path[0]) {
-          errors[err.path[0].toString()] = err.message;
-        }
-      });
-      return { success: false, errors };
+      return {
+        success: false,
+        errors: formatValidationErrors(validationResult.error),
+      };
     }
 
     const data = validationResult.data;
+    const normalizedUrls = normalizeNullableUrls(data);
 
     await prisma.siteSettings.upsert({
       where: { id: "default" },
-      update: {
-        ...data,
-        facebookUrl: data.facebookUrl || null,
-        instagramUrl: data.instagramUrl || null,
-        twitterUrl: data.twitterUrl || null,
-        linkedinUrl: data.linkedinUrl || null,
-        youtubeUrl: data.youtubeUrl || null,
-        heroImageUrl: data.heroImageUrl || null,
-        aboutImageUrl: data.aboutImageUrl || null,
-      },
-      create: {
-        id: "default",
-        ...data,
-        facebookUrl: data.facebookUrl || null,
-        instagramUrl: data.instagramUrl || null,
-        twitterUrl: data.twitterUrl || null,
-        linkedinUrl: data.linkedinUrl || null,
-        youtubeUrl: data.youtubeUrl || null,
-        heroImageUrl: data.heroImageUrl || null,
-        aboutImageUrl: data.aboutImageUrl || null,
-      },
+      update: { ...data, ...normalizedUrls },
+      create: { id: "default", ...data, ...normalizedUrls },
     });
 
-    revalidateTag(CACHE_TAGS.settings);
+    revalidateSettingsPaths();
 
     return { success: true };
   } catch (error) {
@@ -88,26 +51,15 @@ export async function createService(formData: FormData) {
   try {
     await requireAdmin();
 
-    const rawData = {
-      name: formData.get("name"),
-      slug: formData.get("slug"),
-      description: formData.get("description"),
-      icon: formData.get("icon") || null,
-      imageUrl: formData.get("imageUrl") || null,
-      featured: formData.get("featured") === "true",
-      order: parseInt(formData.get("order") as string) || 0,
-    };
+    const rawData = parseServiceFormData(formData);
 
     const validationResult = serviceSchema.safeParse(rawData);
 
     if (!validationResult.success) {
-      const errors: Record<string, string> = {};
-      validationResult.error.errors.forEach((err) => {
-        if (err.path[0]) {
-          errors[err.path[0].toString()] = err.message;
-        }
-      });
-      return { success: false, errors };
+      return {
+        success: false,
+        errors: formatValidationErrors(validationResult.error),
+      };
     }
 
     const data = validationResult.data;
@@ -118,7 +70,10 @@ export async function createService(formData: FormData) {
     });
 
     if (existing) {
-      return { success: false, errors: { slug: "A service with this slug already exists" } };
+      return {
+        success: false,
+        errors: { slug: "A service with this slug already exists" },
+      };
     }
 
     await prisma.service.create({
@@ -128,7 +83,7 @@ export async function createService(formData: FormData) {
       },
     });
 
-    revalidateTag(CACHE_TAGS.services);
+    revalidateServicePaths();
 
     return { success: true };
   } catch (error) {
@@ -141,26 +96,15 @@ export async function updateService(id: string, formData: FormData) {
   try {
     await requireAdmin();
 
-    const rawData = {
-      name: formData.get("name"),
-      slug: formData.get("slug"),
-      description: formData.get("description"),
-      icon: formData.get("icon") || null,
-      imageUrl: formData.get("imageUrl") || null,
-      featured: formData.get("featured") === "true",
-      order: parseInt(formData.get("order") as string) || 0,
-    };
+    const rawData = parseServiceFormData(formData);
 
     const validationResult = serviceSchema.safeParse(rawData);
 
     if (!validationResult.success) {
-      const errors: Record<string, string> = {};
-      validationResult.error.errors.forEach((err) => {
-        if (err.path[0]) {
-          errors[err.path[0].toString()] = err.message;
-        }
-      });
-      return { success: false, errors };
+      return {
+        success: false,
+        errors: formatValidationErrors(validationResult.error),
+      };
     }
 
     const data = validationResult.data;
@@ -171,7 +115,10 @@ export async function updateService(id: string, formData: FormData) {
     });
 
     if (existing) {
-      return { success: false, errors: { slug: "A service with this slug already exists" } };
+      return {
+        success: false,
+        errors: { slug: "A service with this slug already exists" },
+      };
     }
 
     await prisma.service.update({
@@ -182,7 +129,7 @@ export async function updateService(id: string, formData: FormData) {
       },
     });
 
-    revalidateTag(CACHE_TAGS.services);
+    revalidateServicePaths();
 
     return { success: true };
   } catch (error) {
@@ -197,7 +144,7 @@ export async function deleteService(id: string) {
 
     await prisma.service.delete({ where: { id } });
 
-    revalidateTag(CACHE_TAGS.services);
+    revalidateServicePaths();
 
     return { success: true };
   } catch (error) {

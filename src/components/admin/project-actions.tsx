@@ -26,7 +26,9 @@ export function ProjectActions({ project }: ProjectActionsProps) {
     try {
       const result = await toggleProjectFeatured(project.id);
       if (result.success) {
-        toast.success(result.featured ? "Project featured" : "Project unfeatured");
+        toast.success(
+          result.featured ? "Project featured" : "Project unfeatured",
+        );
         router.refresh();
       } else {
         toast.error(result.message || "Failed to update project");
@@ -73,10 +75,10 @@ export function ProjectActions({ project }: ProjectActionsProps) {
               className="fixed inset-0 z-10"
               onClick={() => setIsOpen(false)}
             />
-            <div className="absolute right-0 top-full mt-1 z-20 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1">
+            <div className="absolute right-0 top-full mt-1 z-20 w-48 bg-[#121212] rounded-lg shadow-lg border border-gray-800 py-1">
               <a
                 href={`/admin/projects/${project.id}/edit`}
-                className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                className="flex items-center gap-2 px-4 py-2 text-sm text-[#CFCFCF] hover:bg-gray-800 hover:text-white"
                 onClick={() => setIsOpen(false)}
               >
                 <Pencil className="h-4 w-4" />
@@ -85,7 +87,7 @@ export function ProjectActions({ project }: ProjectActionsProps) {
               <a
                 href={`/projects/${project.slug}`}
                 target="_blank"
-                className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                className="flex items-center gap-2 px-4 py-2 text-sm text-[#CFCFCF] hover:bg-gray-800 hover:text-white"
                 onClick={() => setIsOpen(false)}
               >
                 <Eye className="h-4 w-4" />
@@ -93,7 +95,7 @@ export function ProjectActions({ project }: ProjectActionsProps) {
               </a>
               <button
                 onClick={handleToggleFeatured}
-                className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+                className="flex items-center gap-2 px-4 py-2 text-sm text-[#CFCFCF] hover:bg-gray-800 hover:text-white w-full text-left"
               >
                 {project.featured ? (
                   <>
@@ -107,13 +109,13 @@ export function ProjectActions({ project }: ProjectActionsProps) {
                   </>
                 )}
               </button>
-              <hr className="my-1 border-gray-200" />
+              <hr className="my-1 border-gray-800" />
               <button
                 onClick={() => {
                   setIsOpen(false);
                   setShowDeleteDialog(true);
                 }}
-                className="flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 w-full text-left"
+                className="flex items-center gap-2 px-4 py-2 text-sm text-red-400 hover:bg-red-400/10 w-full text-left"
               >
                 <Trash2 className="h-4 w-4" />
                 Delete

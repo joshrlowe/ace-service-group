@@ -43,3 +43,19 @@ export function getInitials(name: string): string {
     .toUpperCase()
     .slice(0, 2);
 }
+
+export function formatValidationErrors(zodError: {
+  issues: Array<{ path: Array<string | number | symbol>; message: string }>;
+}): Record<string, string> {
+  const errors: Record<string, string> = {};
+  zodError.issues.forEach((err) => {
+    const firstPath = err.path[0];
+    if (
+      firstPath !== undefined &&
+      (typeof firstPath === "string" || typeof firstPath === "number")
+    ) {
+      errors[firstPath.toString()] = err.message;
+    }
+  });
+  return errors;
+}

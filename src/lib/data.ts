@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db";
 import { unstable_cache } from "next/cache";
+import { DEFAULT_SITE_SETTINGS } from "@/lib/defaults";
 
 // Cache tags for revalidation
 export const CACHE_TAGS = {
@@ -18,40 +19,13 @@ export const getSiteSettings = unstable_cache(
 
     // Return defaults if no settings exist
     if (!settings) {
-      return {
-        id: "default",
-        businessName: "Ace Service Group LLC",
-        tagline: "At Ace Service Group, we turn problems into solutions.",
-        introText: null,
-        phone: "(267) 640-5958",
-        email: "aceservicegroupllc@gmail.com",
-        hours: "Always open",
-        serviceArea: "Lansdale, PA and surrounding areas",
-        address: null,
-        facebookUrl: null,
-        instagramUrl: null,
-        twitterUrl: null,
-        linkedinUrl: null,
-        youtubeUrl: null,
-        heroHeadline: "Quality Construction & Home Services",
-        heroSubheadline:
-          "From simple plumbing calls to full scale renovations - we turn problems into solutions.",
-        heroCta1Text: "Call Now",
-        heroCta1Link: "tel:+12676405958",
-        heroCta2Text: "Request a Quote",
-        heroCta2Link: "/contact",
-        heroImageUrl: null,
-        aboutHeadline: "About Ace Service Group",
-        aboutContent: null,
-        aboutImageUrl: null,
-        updatedAt: new Date(),
-      };
+      return DEFAULT_SITE_SETTINGS;
     }
 
     return settings;
   },
   [CACHE_TAGS.settings],
-  { tags: [CACHE_TAGS.settings], revalidate: 60 }
+  { tags: [CACHE_TAGS.settings], revalidate: 60 },
 );
 
 // Get all services with caching
@@ -62,7 +36,7 @@ export const getServices = unstable_cache(
     });
   },
   [CACHE_TAGS.services],
-  { tags: [CACHE_TAGS.services], revalidate: 60 }
+  { tags: [CACHE_TAGS.services], revalidate: 60 },
 );
 
 // Get featured services
@@ -74,12 +48,16 @@ export const getFeaturedServices = unstable_cache(
     });
   },
   ["featured-services"],
-  { tags: [CACHE_TAGS.services], revalidate: 60 }
+  { tags: [CACHE_TAGS.services], revalidate: 60 },
 );
 
 // Get all published projects with caching
 export const getProjects = unstable_cache(
-  async (options?: { category?: string; featured?: boolean; limit?: number }) => {
+  async (options?: {
+    category?: string;
+    featured?: boolean;
+    limit?: number;
+  }) => {
     const where: Record<string, unknown> = { published: true };
 
     if (options?.category) {
@@ -101,7 +79,7 @@ export const getProjects = unstable_cache(
     });
   },
   [CACHE_TAGS.projects],
-  { tags: [CACHE_TAGS.projects], revalidate: 60 }
+  { tags: [CACHE_TAGS.projects], revalidate: 60 },
 );
 
 // Get featured projects
@@ -120,7 +98,7 @@ export const getFeaturedProjects = unstable_cache(
     });
   },
   ["featured-projects"],
-  { tags: [CACHE_TAGS.projects], revalidate: 60 }
+  { tags: [CACHE_TAGS.projects], revalidate: 60 },
 );
 
 // Get single project by slug
@@ -136,7 +114,7 @@ export const getProjectBySlug = unstable_cache(
     });
   },
   ["project"],
-  { tags: [CACHE_TAGS.projects], revalidate: 60 }
+  { tags: [CACHE_TAGS.projects], revalidate: 60 },
 );
 
 // Get project categories
@@ -150,5 +128,5 @@ export const getProjectCategories = unstable_cache(
     return projects.map((p) => p.category);
   },
   ["project-categories"],
-  { tags: [CACHE_TAGS.projects], revalidate: 60 }
+  { tags: [CACHE_TAGS.projects], revalidate: 60 },
 );

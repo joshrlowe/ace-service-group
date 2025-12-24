@@ -29,7 +29,9 @@ async function getStats() {
   return { total, unhandled, handled: total - unhandled };
 }
 
-export default async function SubmissionsPage({ searchParams }: SubmissionsPageProps) {
+export default async function SubmissionsPage({
+  searchParams,
+}: SubmissionsPageProps) {
   const params = await searchParams;
   const [submissions, stats] = await Promise.all([
     getSubmissions(params.handled),
@@ -39,8 +41,8 @@ export default async function SubmissionsPage({ searchParams }: SubmissionsPageP
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Contact Submissions</h1>
-        <p className="mt-1 text-gray-500">
+        <h1 className="text-2xl font-bold text-white">Contact Submissions</h1>
+        <p className="mt-1 text-[#CFCFCF]">
           Manage contact form submissions from your website
         </p>
       </div>

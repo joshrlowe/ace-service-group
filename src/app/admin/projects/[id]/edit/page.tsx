@@ -27,7 +27,9 @@ async function getCategories() {
   return projects.map((p) => p.category);
 }
 
-export default async function EditProjectPage({ params }: EditProjectPageProps) {
+export default async function EditProjectPage({
+  params,
+}: EditProjectPageProps) {
   const { id } = await params;
   const [project, categories] = await Promise.all([
     getProject(id),
@@ -43,15 +45,13 @@ export default async function EditProjectPage({ params }: EditProjectPageProps) 
       <div>
         <Link
           href="/admin/projects"
-          className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900 mb-4"
+          className="inline-flex items-center text-sm text-[#CFCFCF] hover:text-white mb-4"
         >
           <ArrowLeft className="h-4 w-4 mr-1" />
           Back to Projects
         </Link>
-        <h1 className="text-2xl font-bold text-gray-900">Edit Project</h1>
-        <p className="mt-1 text-gray-500">
-          Update project details and images
-        </p>
+        <h1 className="text-2xl font-bold text-white">Edit Project</h1>
+        <p className="mt-1 text-[#CFCFCF]">Update project details and images</p>
       </div>
 
       <ProjectForm project={project} categories={categories} />

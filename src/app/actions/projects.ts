@@ -1,42 +1,28 @@
 "use server";
 
-import { revalidateTag } from "next/cache";
 import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth";
 import { projectSchema } from "@/lib/validations";
-import { CACHE_TAGS } from "@/lib/data";
-import { slugify } from "@/lib/utils";
+import { formatValidationErrors } from "@/lib/utils";
+import { revalidateProjectPaths } from "@/lib/revalidation";
+import {
+  parseProjectFormData,
+  mapProjectDataForDatabase,
+} from "@/lib/form-parsers";
 
 export async function createProject(formData: FormData) {
   try {
     await requireAdmin();
 
-    const rawData = {
-      title: formData.get("title"),
-      slug: formData.get("slug") || slugify(formData.get("title") as string),
-      shortDescription: formData.get("shortDescription"),
-      fullDescription: formData.get("fullDescription") || null,
-      category: formData.get("category"),
-      location: formData.get("location") || null,
-      projectDate: formData.get("projectDate") || null,
-      featured: formData.get("featured") === "true",
-      published: formData.get("published") !== "false",
-      tags: formData.get("tags")
-        ? (formData.get("tags") as string).split(",").map((t) => t.trim()).filter(Boolean)
-        : [],
-      imageUrls: formData.getAll("imageUrls").filter(Boolean) as string[],
-    };
+    const rawData = parseProjectFormData(formData);
 
     const validationResult = projectSchema.safeParse(rawData);
 
     if (!validationResult.success) {
-      const errors: Record<string, string> = {};
-      validationResult.error.errors.forEach((err) => {
-        if (err.path[0]) {
-          errors[err.path[0].toString()] = err.message;
-        }
-      });
-      return { success: false, errors };
+      return {
+        success: false,
+        errors: formatValidationErrors(validationResult.error),
+      };
     }
 
     const data = validationResult.data;
@@ -54,27 +40,10 @@ export async function createProject(formData: FormData) {
     }
 
     const project = await prisma.project.create({
-      data: {
-        title: data.title,
-        slug: data.slug,
-        shortDescription: data.shortDescription,
-        fullDescription: data.fullDescription,
-        category: data.category,
-        location: data.location,
-        projectDate: data.projectDate ? new Date(data.projectDate) : null,
-        featured: data.featured,
-        published: data.published,
-        tags: data.tags,
-        images: {
-          create: data.imageUrls.map((url, index) => ({
-            url,
-            order: index,
-          })),
-        },
-      },
+      data: mapProjectDataForDatabase(data),
     });
 
-    revalidateTag(CACHE_TAGS.projects);
+    revalidateProjectPaths();
 
     return { success: true, project };
   } catch (error) {
@@ -87,79 +56,41 @@ export async function updateProject(id: string, formData: FormData) {
   try {
     await requireAdmin();
 
-    const rawData = {
-      title: formData.get("title"),
-      slug: formData.get("slug"),
-      shortDescription: formData.get("shortDescription"),
-      fullDescription: formData.get("fullDescription") || null,
-      category: formData.get("category"),
-      location: formData.get("location") || null,
-      projectDate: formData.get("projectDate") || null,
-      featured: formData.get("featured") === "true",
-      published: formData.get("published") !== "false",
-      tags: formData.get("tags")
-        ? (formData.get("tags") as string).split(",").map((t) => t.trim()).filter(Boolean)
-        : [],
-      imageUrls: formData.getAll("imageUrls").filter(Boolean) as string[],
-    };
+    const rawData = parseProjectFormData(formData);
 
     const validationResult = projectSchema.safeParse(rawData);
 
     if (!validationResult.success) {
-      const errors: Record<string, string> = {};
-      validationResult.error.errors.forEach((err) => {
-        if (err.path[0]) {
-          errors[err.path[0].toString()] = err.message;
-        }
-      });
-      return { success: false, errors };
+      return {
+        success: false,
+        errors: formatValidationErrors(validationResult.error),
+      };
     }
 
     const data = validationResult.data;
 
-    // Check if slug already exists (excluding current project)
-    const existingProject = await prisma.project.findFirst({
-      where: {
-        slug: data.slug,
-        NOT: { id },
-      },
+    const slugConflict = await prisma.project.findFirst({
+      where: { slug: data.slug, NOT: { id } },
     });
 
-    if (existingProject) {
+    if (slugConflict) {
       return {
         success: false,
         errors: { slug: "A project with this slug already exists" },
       };
     }
 
-    // Delete existing images and recreate
+    // Delete existing images before recreating
     await prisma.projectImage.deleteMany({
       where: { projectId: id },
     });
 
     const project = await prisma.project.update({
       where: { id },
-      data: {
-        title: data.title,
-        slug: data.slug,
-        shortDescription: data.shortDescription,
-        fullDescription: data.fullDescription,
-        category: data.category,
-        location: data.location,
-        projectDate: data.projectDate ? new Date(data.projectDate) : null,
-        featured: data.featured,
-        published: data.published,
-        tags: data.tags,
-        images: {
-          create: data.imageUrls.map((url, index) => ({
-            url,
-            order: index,
-          })),
-        },
-      },
+      data: mapProjectDataForDatabase(data),
     });
 
-    revalidateTag(CACHE_TAGS.projects);
+    revalidateProjectPaths();
 
     return { success: true, project };
   } catch (error) {
@@ -176,7 +107,7 @@ export async function deleteProject(id: string) {
       where: { id },
     });
 
-    revalidateTag(CACHE_TAGS.projects);
+    revalidateProjectPaths();
 
     return { success: true };
   } catch (error) {
@@ -203,7 +134,7 @@ export async function toggleProjectFeatured(id: string) {
       data: { featured: !project.featured },
     });
 
-    revalidateTag(CACHE_TAGS.projects);
+    revalidateProjectPaths();
 
     return { success: true, featured: updated.featured };
   } catch (error) {

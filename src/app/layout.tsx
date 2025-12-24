@@ -6,11 +6,13 @@ import { ToastProvider } from "@/components/ui/toast-provider";
 const inter = Inter({
   subsets: ["latin"],
   display: "swap",
+  variable: "--font-inter",
 });
 
 export const metadata: Metadata = {
   title: {
-    default: "Ace Service Group LLC | Construction & Home Services in Lansdale, PA",
+    default:
+      "Ace Service Group LLC | Construction & Home Services in Lansdale, PA",
     template: "%s | Ace Service Group LLC",
   },
   description:
@@ -46,7 +48,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.className} antialiased`}>
+      <body className={`${inter.variable} ${inter.className} antialiased`}>
         {children}
         <ToastProvider />
       </body>

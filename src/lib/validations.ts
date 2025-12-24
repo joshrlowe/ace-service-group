@@ -12,9 +12,12 @@ export const contactFormSchema = z.object({
     .optional()
     .refine(
       (val) => !val || /^[\d\s\-\+\(\)]+$/.test(val),
-      "Please enter a valid phone number"
+      "Please enter a valid phone number",
     ),
-  subject: z.string().max(200, "Subject must be less than 200 characters").optional(),
+  subject: z
+    .string()
+    .max(200, "Subject must be less than 200 characters")
+    .optional(),
   message: z
     .string()
     .min(10, "Message must be at least 10 characters")
@@ -33,7 +36,10 @@ export const projectSchema = z.object({
     .string()
     .min(2, "Slug must be at least 2 characters")
     .max(200, "Slug must be less than 200 characters")
-    .regex(/^[a-z0-9-]+$/, "Slug must contain only lowercase letters, numbers, and hyphens"),
+    .regex(
+      /^[a-z0-9-]+$/,
+      "Slug must contain only lowercase letters, numbers, and hyphens",
+    ),
   shortDescription: z
     .string()
     .min(10, "Short description must be at least 10 characters")
@@ -44,7 +50,11 @@ export const projectSchema = z.object({
     .optional()
     .nullable(),
   category: z.string().min(1, "Category is required"),
-  location: z.string().max(200, "Location must be less than 200 characters").optional().nullable(),
+  location: z
+    .string()
+    .max(200, "Location must be less than 200 characters")
+    .optional()
+    .nullable(),
   projectDate: z.string().optional().nullable(),
   featured: z.boolean().default(false),
   published: z.boolean().default(true),
@@ -90,7 +100,10 @@ export const serviceSchema = z.object({
     .string()
     .min(2, "Slug must be at least 2 characters")
     .max(100)
-    .regex(/^[a-z0-9-]+$/, "Slug must contain only lowercase letters, numbers, and hyphens"),
+    .regex(
+      /^[a-z0-9-]+$/,
+      "Slug must contain only lowercase letters, numbers, and hyphens",
+    ),
   description: z
     .string()
     .min(10, "Description must be at least 10 characters")

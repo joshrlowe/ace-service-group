@@ -8,9 +8,19 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
-import { createService, updateService, deleteService } from "@/app/actions/settings";
+import {
+  createService,
+  updateService,
+  deleteService,
+} from "@/app/actions/settings";
 import { slugify } from "@/lib/utils";
 
 interface Service {
@@ -122,12 +132,14 @@ export function ServicesManager({ services }: ServicesManagerProps) {
   }
 
   return (
-    <Card>
+    <Card className="bg-[#121212] border-gray-800">
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle>Services</CardTitle>
-            <CardDescription>Manage your service offerings</CardDescription>
+            <CardTitle className="text-white">Services</CardTitle>
+            <CardDescription className="text-[#CFCFCF]">
+              Manage your service offerings
+            </CardDescription>
           </div>
           {!isAdding && (
             <Button onClick={() => setIsAdding(true)} size="sm">
@@ -140,24 +152,33 @@ export function ServicesManager({ services }: ServicesManagerProps) {
       <CardContent className="space-y-4">
         {/* Add Service Form */}
         {isAdding && (
-          <form onSubmit={handleCreate} className="border rounded-lg p-4 bg-gray-50 space-y-4">
-            <h4 className="font-medium">New Service</h4>
+          <form
+            onSubmit={handleCreate}
+            className="border border-gray-800 rounded-lg p-4 bg-[#0F0F0F] space-y-4"
+          >
+            <h4 className="font-medium text-white">New Service</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="new-name" required>Name</Label>
+                <Label htmlFor="new-name" required>
+                  Name
+                </Label>
                 <Input
                   id="new-name"
                   name="name"
                   placeholder="Service name"
                   error={errors.name}
                   onChange={(e) => {
-                    const slugInput = document.getElementById("new-slug") as HTMLInputElement;
+                    const slugInput = document.getElementById(
+                      "new-slug",
+                    ) as HTMLInputElement;
                     if (slugInput) slugInput.value = slugify(e.target.value);
                   }}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="new-slug" required>Slug</Label>
+                <Label htmlFor="new-slug" required>
+                  Slug
+                </Label>
                 <Input
                   id="new-slug"
                   name="slug"
@@ -167,7 +188,9 @@ export function ServicesManager({ services }: ServicesManagerProps) {
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="new-description" required>Description</Label>
+              <Label htmlFor="new-description" required>
+                Description
+              </Label>
               <Textarea
                 id="new-description"
                 name="description"
@@ -182,24 +205,32 @@ export function ServicesManager({ services }: ServicesManagerProps) {
                 <select
                   id="new-icon"
                   name="icon"
-                  className="h-10 w-full rounded-md border border-gray-300 bg-white px-3 text-sm"
+                  className="h-10 w-full rounded-md border border-gray-700 bg-[#121212] text-[#CFCFCF] px-3 text-sm"
                 >
                   <option value="">Select icon</option>
                   {iconOptions.map((opt) => (
-                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
                   ))}
                 </select>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="new-order">Order</Label>
-                <Input id="new-order" name="order" type="number" defaultValue="0" min="0" />
+                <Input
+                  id="new-order"
+                  name="order"
+                  type="number"
+                  defaultValue="0"
+                  min="0"
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="new-featured">Featured</Label>
                 <select
                   id="new-featured"
                   name="featured"
-                  className="h-10 w-full rounded-md border border-gray-300 bg-white px-3 text-sm"
+                  className="h-10 w-full rounded-md border border-gray-700 bg-[#121212] text-[#CFCFCF] px-3 text-sm"
                 >
                   <option value="false">No</option>
                   <option value="true">Yes</option>
@@ -207,8 +238,18 @@ export function ServicesManager({ services }: ServicesManagerProps) {
               </div>
             </div>
             <div className="flex gap-2">
-              <Button type="submit" size="sm" loading={isSubmitting}>Save</Button>
-              <Button type="button" variant="outline" size="sm" onClick={() => { setIsAdding(false); setErrors({}); }}>
+              <Button type="submit" size="sm" loading={isSubmitting}>
+                Save
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setIsAdding(false);
+                  setErrors({});
+                }}
+              >
                 Cancel
               </Button>
             </div>
@@ -223,17 +264,25 @@ export function ServicesManager({ services }: ServicesManagerProps) {
                 {editingId === service.id ? (
                   <form
                     onSubmit={(e) => handleUpdate(e, service.id)}
-                    className="border rounded-lg p-4 bg-gray-50 space-y-4"
+                    className="border border-gray-800 rounded-lg p-4 bg-[#0F0F0F] space-y-4"
                   >
-                    <h4 className="font-medium">Edit Service</h4>
+                    <h4 className="font-medium text-white">Edit Service</h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label required>Name</Label>
-                        <Input name="name" defaultValue={service.name} error={errors.name} />
+                        <Input
+                          name="name"
+                          defaultValue={service.name}
+                          error={errors.name}
+                        />
                       </div>
                       <div className="space-y-2">
                         <Label required>Slug</Label>
-                        <Input name="slug" defaultValue={service.slug} error={errors.slug} />
+                        <Input
+                          name="slug"
+                          defaultValue={service.slug}
+                          error={errors.slug}
+                        />
                       </div>
                     </div>
                     <div className="space-y-2">
@@ -251,24 +300,31 @@ export function ServicesManager({ services }: ServicesManagerProps) {
                         <select
                           name="icon"
                           defaultValue={service.icon || ""}
-                          className="h-10 w-full rounded-md border border-gray-300 bg-white px-3 text-sm"
+                          className="h-10 w-full rounded-md border border-gray-700 bg-[#121212] text-[#CFCFCF] px-3 text-sm"
                         >
                           <option value="">Select icon</option>
                           {iconOptions.map((opt) => (
-                            <option key={opt.value} value={opt.value}>{opt.label}</option>
+                            <option key={opt.value} value={opt.value}>
+                              {opt.label}
+                            </option>
                           ))}
                         </select>
                       </div>
                       <div className="space-y-2">
                         <Label>Order</Label>
-                        <Input name="order" type="number" defaultValue={service.order} min="0" />
+                        <Input
+                          name="order"
+                          type="number"
+                          defaultValue={service.order}
+                          min="0"
+                        />
                       </div>
                       <div className="space-y-2">
                         <Label>Featured</Label>
                         <select
                           name="featured"
                           defaultValue={service.featured ? "true" : "false"}
-                          className="h-10 w-full rounded-md border border-gray-300 bg-white px-3 text-sm"
+                          className="h-10 w-full rounded-md border border-gray-700 bg-[#121212] text-[#CFCFCF] px-3 text-sm"
                         >
                           <option value="false">No</option>
                           <option value="true">Yes</option>
@@ -276,30 +332,39 @@ export function ServicesManager({ services }: ServicesManagerProps) {
                       </div>
                     </div>
                     <div className="flex gap-2">
-                      <Button type="submit" size="sm" loading={isSubmitting}>Update</Button>
+                      <Button type="submit" size="sm" loading={isSubmitting}>
+                        Update
+                      </Button>
                       <Button
                         type="button"
                         variant="outline"
                         size="sm"
-                        onClick={() => { setEditingId(null); setErrors({}); }}
+                        onClick={() => {
+                          setEditingId(null);
+                          setErrors({});
+                        }}
                       >
                         Cancel
                       </Button>
                     </div>
                   </form>
                 ) : (
-                  <div className="flex items-center gap-4 p-4 border rounded-lg hover:bg-gray-50">
-                    <GripVertical className="h-5 w-5 text-gray-400" />
+                  <div className="flex items-center gap-4 p-4 border border-gray-800 rounded-lg hover:bg-gray-800 bg-[#121212]">
+                    <GripVertical className="h-5 w-5 text-[#CFCFCF]" />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <p className="font-medium truncate">{service.name}</p>
+                        <p className="font-medium truncate text-white">
+                          {service.name}
+                        </p>
                         {service.featured && (
-                          <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded">
+                          <span className="text-xs bg-[#B71C1C]/20 text-[#B71C1C] border border-[#B71C1C]/30 px-2 py-0.5 rounded">
                             Featured
                           </span>
                         )}
                       </div>
-                      <p className="text-sm text-gray-500 truncate">{service.description}</p>
+                      <p className="text-sm text-[#CFCFCF] truncate">
+                        {service.description}
+                      </p>
                     </div>
                     <div className="flex items-center gap-2">
                       <Button
@@ -325,7 +390,7 @@ export function ServicesManager({ services }: ServicesManagerProps) {
             ))}
           </div>
         ) : (
-          <p className="text-gray-500 text-sm text-center py-8">
+          <p className="text-[#CFCFCF] text-sm text-center py-8">
             No services yet. Add your first service above.
           </p>
         )}

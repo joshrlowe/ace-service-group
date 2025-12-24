@@ -17,7 +17,9 @@ export default async function PublicLayout({
         businessName={settings.businessName}
         phone={settings.phone}
         email={settings.email}
-        serviceArea={settings.serviceArea || "Lansdale, PA and surrounding areas"}
+        serviceArea={
+          settings.serviceArea || "Lansdale, PA and surrounding areas"
+        }
         hours={settings.hours || "Always open"}
         facebookUrl={settings.facebookUrl}
         instagramUrl={settings.instagramUrl}

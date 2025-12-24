@@ -20,7 +20,7 @@ export default async function AdminLayout({
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-black">
       <AdminSidebar user={session.user} />
       <div className="lg:pl-64">
         <main className="py-6">
